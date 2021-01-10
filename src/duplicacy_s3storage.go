@@ -12,6 +12,8 @@ package duplicacy
 import (
 	"reflect"
 	"strings"
+	"crypto/tls"
+	"net/http"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -39,7 +41,13 @@ func CreateS3Storage(regionName string, endpoint string, bucketName string, stor
 	auth := credentials.NewStaticCredentials(accessKey, secretKey, token)
 
 	if regionName == "" && endpoint == "" {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport: tr}
+
 		defaultRegionConfig := &aws.Config{
+			HTTPClient:  client,
 			Region:      aws.String("us-east-1"),
 			Credentials: auth,
 		}
@@ -57,8 +65,13 @@ func CreateS3Storage(regionName string, endpoint string, bucketName string, stor
 			regionName = *response.LocationConstraint
 		}
 	}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
 
 	s3Config := &aws.Config{
+		HTTPClient: 	client,
 		Region:           aws.String("default"),
 		Credentials:      auth,
 		Endpoint:         aws.String(endpoint),
