@@ -59,7 +59,7 @@ func CreateS3Storage(regionName string, endpoint string, bucketName string, stor
 	}
 
 	s3Config := &aws.Config{
-		Region:           aws.String(""),
+		Region:           "default",
 		Credentials:      auth,
 		Endpoint:         aws.String(endpoint),
 		S3ForcePathStyle: aws.Bool(isMinioCompatible),
